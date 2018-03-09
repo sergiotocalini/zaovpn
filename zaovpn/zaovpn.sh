@@ -62,7 +62,7 @@ get_status() {
 	raw=`echo "${raw}" | grep "${qfilter}"`
     fi
     
-    if [[ ${attr} =~ (3|4) ]]; then
+    if [[ ${attr} =~ ^(3|4)$ ]]; then
 	res=`echo "${raw}" | awk -F, "{s+=$"${attr}"} END {print s}"`
     else
 	res=`echo "${raw}" | wc -l`
