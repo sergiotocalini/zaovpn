@@ -49,6 +49,22 @@ version() {
     exit 1
 }
 
+get_service() {
+    resource=${1}
+
+    pid=`lsof -Pi TCP@${OPENVPN_LISTEN}:${OPENVPN_PORT} -sTCP:LISTEN -t`
+    rcode="${?}"
+    if [[ ${resource} == 'listen' ]]; then
+	if [[ ${rcode} == 0]]; then
+	    res=1
+	fi
+    elif [[ ${resource} == 'uptime' ]]; then
+	res=`ps -p ${pid} -o etimes -h`
+    fi
+    echo ${res:-0}
+    return 0
+}
+
 get_status() {
     attr=${1}
     qfilter=${2}
@@ -67,6 +83,7 @@ get_status() {
 	res=`echo "${raw}" | wc -l`
     fi
     echo ${res}
+    return 0
 }
 #
 #################################################################################
@@ -123,6 +140,9 @@ if [[ ${JSON} -eq 1 ]]; then
 else
     if [[ ${SECTION} == 'status' ]]; then
 	rval=$( get_status ${ARGS[*]} )
+	rcode="${?}"
+    elif [[ ${SECTION} == 'service' ]]; then
+	rval=${ get_service ${ARGS[*]}}
 	rcode="${?}"
     fi
     echo ${rval:-0}
