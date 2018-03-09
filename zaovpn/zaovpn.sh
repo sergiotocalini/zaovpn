@@ -55,7 +55,7 @@ get_service() {
     pid=`lsof -Pi TCP@${OPENVPN_LISTEN}:${OPENVPN_PORT} -sTCP:LISTEN -t`
     rcode="${?}"
     if [[ ${resource} == 'listen' ]]; then
-	if [[ ${rcode} == 0]]; then
+	if [[ ${rcode} == 0 ]]; then
 	    res=1
 	fi
     elif [[ ${resource} == 'uptime' ]]; then
