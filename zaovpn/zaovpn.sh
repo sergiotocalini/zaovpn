@@ -37,7 +37,7 @@ usage() {
     echo "  -a            Query arguments."
     echo "  -h            Displays this help message."
     echo "  -j            Jsonify output."
-    echo "  -s ARG(str)   Section (default=stat)."
+    echo "  -s ARG(str)   Section (status or service)."
     echo "  -v            Show the script version."
     echo ""
     echo "Please send any bug reports to sergiotocalini@gmail.com"
@@ -59,7 +59,9 @@ get_service() {
 	    res=1
 	fi
     elif [[ ${resource} == 'uptime' ]]; then
-	res=`ps -p ${pid} -o etimes -h`
+	if [[ ${rcode} == 0 ]]; then
+	    res=`ps -p ${pid} -o etimes -h`
+	fi
     fi
     echo ${res:-0}
     return 0
@@ -70,15 +72,21 @@ get_status() {
     qfilter=${2}
     file=${3:-/etc/openvpn/openvpn-status.log}
 
-    index="1:Common Name;2:Real Address;3:Bytes Received;4:Bytes Sent;5:Connected Since"
+    map="1:common_name;2:real_address;3:bytes_received;4:bytes_sent;5:connected_since"
+
+    if [[ ${attr} == 'bytes_received' ]]; then
+	index=3
+    elif [[ ${attr} == 'bytes_sent' ]]; then
+	index=4
+    fi
     
     raw=`awk '/CLIENT LIST/,/ROUTING TABLE/' ${file} | tail -n +4 | head -n -1`
     if ! [[ -z ${qfilter} ]]; then
 	raw=`echo "${raw}" | grep "${qfilter}"`
     fi
     
-    if [[ ${attr} =~ ^(3|4)$ ]]; then
-	res=`echo "${raw}" | awk -F, "{s+=$"${attr}"} END {print s}"`
+    if [[ ${index} =~ ^(3|4)$ ]]; then
+	res=`echo "${raw}" | awk -F, "{s+=$"${index}"} END {print s}"`
     else
 	res=`echo "${raw}" | wc -l`
     fi
