@@ -12,6 +12,10 @@ APP_NAME=$(basename $0)
 APP_DIR=$(dirname $0)
 APP_VER="0.0.1"
 APP_WEB="http://www.sergiotocalini.com.ar/"
+OPENVPN_LISTEN="0.0.0.0"
+OPENVPN_PORT="1194"
+OPENVPN_STATUS="/etc/openvpn/openvpn-status.log"
+OPENVPN_CCD="/etc/openvpn/ccd"
 #
 #################################################################################
 
@@ -70,17 +74,15 @@ get_service() {
 get_status() {
     attr=${1}
     qfilter=${2}
-    file=${3:-/etc/openvpn/openvpn-status.log}
 
     map="1:common_name;2:real_address;3:bytes_received;4:bytes_sent;5:connected_since"
-
     if [[ ${attr} == 'bytes_received' ]]; then
 	index=3
     elif [[ ${attr} == 'bytes_sent' ]]; then
 	index=4
     fi
     
-    raw=`awk '/CLIENT LIST/,/ROUTING TABLE/' ${file} | tail -n +4 | head -n -1`
+    raw=`awk '/CLIENT LIST/,/ROUTING TABLE/' ${OPENVPN_STATUS} | tail -n +4 | head -n -1`
     if ! [[ -z ${qfilter} ]]; then
 	raw=`echo "${raw}" | grep "${qfilter}"`
     fi
@@ -91,6 +93,19 @@ get_status() {
 	res=`echo "${raw}" | wc -l`
     fi
     echo ${res}
+    return 0
+}
+
+discovery() {
+    resource=${1}
+    
+    if [[ ${resource} == 'clients' ]]; then
+	for cli in `ls -1 ${OPENVPN_CCD}`; do
+	    echo "${cli}"
+	done
+    else
+	echo ${res:-0}
+    fi
     return 0
 }
 #

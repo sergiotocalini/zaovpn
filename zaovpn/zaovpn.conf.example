@@ -1,3 +1,4 @@
 OPENVPN_LISTEN="0.0.0.0"
 OPENVPN_PORT="1194"
 OPENVPN_STATUS="/etc/openvpn/openvpn-status.log"
+OPENVPN_CCD="/etc/openvpn/ccd"
