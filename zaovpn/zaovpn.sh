@@ -56,7 +56,7 @@ version() {
 get_service() {
     resource=${1}
 
-    pid=`lsof -Pi TCP@${OPENVPN_LISTEN}:${OPENVPN_PORT} -sTCP:LISTEN -t`
+    pid=`sudo lsof -Pi TCP@${OPENVPN_LISTEN}:${OPENVPN_PORT} -sTCP:LISTEN -t`
     rcode="${?}"
     if [[ ${resource} == 'listen' ]]; then
 	if [[ ${rcode} == 0 ]]; then
@@ -64,7 +64,7 @@ get_service() {
 	fi
     elif [[ ${resource} == 'uptime' ]]; then
 	if [[ ${rcode} == 0 ]]; then
-	    res=`ps -p ${pid} -o etimes -h`
+	    res=`sudo ps -p ${pid} -o etimes -h`
 	fi
     fi
     echo ${res:-0}
@@ -82,7 +82,7 @@ get_status() {
 	index=4
     fi
     
-    raw=`awk '/CLIENT LIST/,/ROUTING TABLE/' ${OPENVPN_STATUS} | tail -n +4 | head -n -1`
+    raw=`sudo awk '/CLIENT LIST/,/ROUTING TABLE/' ${OPENVPN_STATUS} | tail -n +4 | head -n -1`
     if ! [[ -z ${qfilter} ]]; then
 	raw=`echo "${raw}" | grep "${qfilter}"`
     fi
@@ -100,7 +100,7 @@ discovery() {
     resource=${1}
     
     if [[ ${resource} == 'clients' ]]; then
-	for cli in `ls -1 ${OPENVPN_CCD}`; do
+	for cli in `sudo ls -1 ${OPENVPN_CCD}`; do
 	    echo "${cli}"
 	done
     else
