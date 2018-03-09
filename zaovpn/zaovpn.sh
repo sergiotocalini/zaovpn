@@ -55,11 +55,11 @@ get_status() {
     qfilter=${2}
     file=${3:-/etc/openvpn/openvpn-status.log}
     
-    raw=`awk "/CLIENT LIST/,/ROUTING TABLE/" ${file} | tail -n +4 | head -n -1`
+    raw=`awk '/CLIENT LIST/,/ROUTING TABLE/' ${file} | tail -n +4 | head -n -1`
     if ! [[ -z ${qfilter} ]]; then
-	raw=`grep "${qfilter}" ${raw}`
+	raw=`echo "${raw}" | grep "${qfilter}"`
     fi
-    res=`echo ${raw} | awk -F, "{s+=$"${index}"} END {print s}"`
+    res=`echo "${raw}" | awk -F, "{s+=$"${index}"} END {print s}"`
     echo ${res}
 }
 #
