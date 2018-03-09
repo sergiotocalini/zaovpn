@@ -51,15 +51,22 @@ version() {
 }
 
 get_status() {
-    index=${1}
+    attr=${1}
     qfilter=${2}
     file=${3:-/etc/openvpn/openvpn-status.log}
+
+    index="1:Common Name;2:Real Address;3:Bytes Received;4:Bytes Sent;5:Connected Since"
     
     raw=`awk '/CLIENT LIST/,/ROUTING TABLE/' ${file} | tail -n +4 | head -n -1`
     if ! [[ -z ${qfilter} ]]; then
 	raw=`echo "${raw}" | grep "${qfilter}"`
     fi
-    res=`echo "${raw}" | awk -F, "{s+=$"${index}"} END {print s}"`
+    
+    if [[ ${attr} =~ (3|4) ]]; then
+	res=`echo "${raw}" | awk -F, "{s+=$"${attr}"} END {print s}"`
+    else
+	res=`echo "${raw}" | wc -l`
+    fi
     echo ${res}
 }
 #
