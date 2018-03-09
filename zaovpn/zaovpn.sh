@@ -1,5 +1,4 @@
 #!/usr/bin/env ksh
-rcode=0
 PATH=/usr/local/bin:${PATH}
 
 #################################################################################
@@ -122,9 +121,11 @@ if [[ ${JSON} -eq 1 ]]; then
     echo '   ]'
     echo '}'
 else
-    rval=$( get_status ${SECTION} ${ARGS[*]} )
-    rcode="${?}"
+    if [[ ${SECTION} == 'status' ]]; then
+	rval=$( get_status ${ARGS[*]} )
+	rcode="${?}"
+    fi
     echo ${rval:-0}
 fi
 
-exit ${rcode}
+exit ${rcode:-0}
