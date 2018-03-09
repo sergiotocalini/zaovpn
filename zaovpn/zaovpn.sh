@@ -142,7 +142,7 @@ else
 	rval=$( get_status ${ARGS[*]} )
 	rcode="${?}"
     elif [[ ${SECTION} == 'service' ]]; then
-	rval=${ get_service ${ARGS[*]}}
+	rval=$( get_service ${ARGS[*]} )
 	rcode="${?}"
     fi
     echo ${rval:-0}
