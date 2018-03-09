@@ -51,15 +51,15 @@ version() {
 }
 
 get_status() {
-    file=${1:-/etc/openvpn/openvpn-status.log}
-    index=${2}
-    qfilter=${3}
+    index=${1}
+    qfilter=${2}
+    file=${3:-/etc/openvpn/openvpn-status.log}
     
     raw=`awk "/CLIENT LIST/,/ROUTING TABLE/" ${file} | tail -n +4 | head -n -1`
     if [[ -z ${qfilter} ]]; then
 	raw=`grep "${qfilter}" ${raw}`
     fi
-    res=`echo ${raw} | awk -F, '{s+=\$index} END {print s}'`
+    res=`echo ${raw} | awk -F, "{s+=$"${index}"} END {print s}"`
     echo ${res}
 }
 #
@@ -115,7 +115,7 @@ if [[ ${JSON} -eq 1 ]]; then
     echo '   ]'
     echo '}'
 else
-    rval=$( get_stat ${SECTION} ${ARGS[*]} )
+    rval=$( get_status ${SECTION} ${ARGS[*]} )
     rcode="${?}"
     echo ${rval:-0}
 fi
