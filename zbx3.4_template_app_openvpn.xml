@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>3.4</version>
-    <date>2018-03-09T14:22:37Z</date>
+    <date>2018-03-12T10:05:11Z</date>
     <groups>
         <group>
             <name>Templates</name>
@@ -117,7 +117,7 @@
                     <status>0</status>
                     <value_type>3</value_type>
                     <allowed_hosts/>
-                    <units>b\s</units>
+                    <units>bps</units>
                     <snmpv3_contextname/>
                     <snmpv3_securityname/>
                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -144,7 +144,7 @@
                     <logtimefmt/>
                     <preprocessing>
                         <step>
-                            <type>10</type>
+                            <type>9</type>
                             <params/>
                         </step>
                     </preprocessing>
@@ -163,7 +163,7 @@
                     <status>0</status>
                     <value_type>3</value_type>
                     <allowed_hosts/>
-                    <units>b\s</units>
+                    <units>bps</units>
                     <snmpv3_contextname/>
                     <snmpv3_securityname/>
                     <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -190,7 +190,7 @@
                     <logtimefmt/>
                     <preprocessing>
                         <step>
-                            <type>10</type>
+                            <type>9</type>
                             <params/>
                         </step>
                     </preprocessing>
@@ -284,7 +284,7 @@
                             <status>0</status>
                             <value_type>3</value_type>
                             <allowed_hosts/>
-                            <units>b\s</units>
+                            <units>bps</units>
                             <snmpv3_contextname/>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -311,7 +311,7 @@
                             <logtimefmt/>
                             <preprocessing>
                                 <step>
-                                    <type>10</type>
+                                    <type>9</type>
                                     <params/>
                                 </step>
                             </preprocessing>
@@ -331,7 +331,7 @@
                             <status>0</status>
                             <value_type>3</value_type>
                             <allowed_hosts/>
-                            <units>b\s</units>
+                            <units>bps</units>
                             <snmpv3_contextname/>
                             <snmpv3_securityname/>
                             <snmpv3_securitylevel>0</snmpv3_securitylevel>
@@ -358,7 +358,7 @@
                             <logtimefmt/>
                             <preprocessing>
                                 <step>
-                                    <type>10</type>
+                                    <type>9</type>
                                     <params/>
                                 </step>
                             </preprocessing>
