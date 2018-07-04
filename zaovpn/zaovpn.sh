@@ -119,19 +119,16 @@ discovery() {
 	while read cert_id; do
 	    cert_file=`find /etc/openvpn/pki/certs/ -name "${cert_id}.*.crt" -print -quit`
 	    [[ -z ${cert_file} ]] && continue
+
+	    output="${cert_id}|"
 	    while read line; do
-		key=`echo ${line}|awk -F'=' '{print $1}'|awk '{$1=$1};1'`
 		val=`echo ${line}|awk -F'=' '{print $2}'|awk '{$1=$1};1'`
-		if [[ -z ${val} ]]; then
-		    output+="${key}|"
-		else
-		    output+="${val}|"
-		fi
-	    done < <(openssl x509 -noout -in ${cert_file} -email -serial -dates 2>/dev/null)
+		output+="${val}|"
+	    done < <(openssl x509 -noout -in ${cert_file} -serial -dates 2>/dev/null)
 	    openssl verify -crl_check_all -verbose \
 	    	           -CAfile "${cafile}" \
 			   -CRLfile "${crlfile}" \
-			   "${cert}" > /dev/null
+			   "${cert_file}" > /dev/null
 	    output="${output%?}|${?}"
 	    echo "${output}"
 	done < <(sort "${OPENVPN_CERTS_LIST}")
