@@ -87,18 +87,18 @@ get_cert() {
 	    openssl verify -crl_check_all -verbose \
 	    	    -CAfile "${OPENVPN_CA}" \
 		    -CRLfile "${OPENVPN_CRL}" \
-		    "${cert}" > /dev/null
+		    "${file}" > /dev/null
 	    res="${?}"
 	elif [[ ${attr} == 'fingerprint' ]]; then
-	    res=`openssl x509 -noout -in ${cert} -fingerprint 2>/dev/null|cut -d'=' -f2`	    
+	    res=`openssl x509 -noout -in ${file} -fingerprint 2>/dev/null|cut -d'=' -f2`	    
 	elif [[ ${attr} == 'serial' ]]; then
-	    res=`openssl x509 -noout -in ${cert} -serial 2>/dev/null|cut -d'=' -f2`
+	    res=`openssl x509 -noout -in ${file} -serial 2>/dev/null|cut -d'=' -f2`
 	elif [[ ${attr} == 'before' ]]; then
-	    res=`openssl x509 -noout -in ${cert} -startdate 2>/dev/null|cut -d'=' -f2`
+	    res=`openssl x509 -noout -in ${file} -startdate 2>/dev/null|cut -d'=' -f2`
 	elif [[ ${attr} == 'after' ]]; then
-	    res=`openssl x509 -noout -in ${cert} -enddate 2>/dev/null|cut -d'=' -f2`
+	    res=`openssl x509 -noout -in ${file} -enddate 2>/dev/null|cut -d'=' -f2`
 	elif [[ ${attr} == 'expires' ]]; then
-	    after=`openssl x509 -noout -in ${cert} -enddate 2>/dev/null|cut -d'=' -f2`
+	    after=`openssl x509 -noout -in ${file} -enddate 2>/dev/null|cut -d'=' -f2`
 	    res=$((($(date -d "${after}" +'%s') - $(date +'%s'))/86400))
 	fi
     fi
