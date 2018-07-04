@@ -124,6 +124,7 @@ discovery() {
 		[[ -z ${file} ]] && continue
 		certs_files[${#certs_files[@]}]="${file}"
 	    done < <(sort "${OPENVPN_CERTS_LIST}" 2>/dev/null)
+	    certs_files=`printf "%s\n" "${certs_file[@]}"`
 	fi
 	while read cert; do
 	    output="${cert_id}|"
@@ -137,7 +138,7 @@ discovery() {
 			   "${cert_file}" > /dev/null
 	    output="${output%?}|${?}"
 	    echo "${output}"
-	done < <(printf '%s\n' "${certs_files[@]}")
+	done < "${certs_files}"
     else
 	echo ${res:-0}
     fi
