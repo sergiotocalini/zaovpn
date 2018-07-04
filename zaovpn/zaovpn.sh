@@ -143,14 +143,14 @@ discovery() {
     elif [[ ${resource} == 'certs' ]]; then
 	cafile=`sudo grep -E "^ca " "${OPENVPN_CONF}" | awk '{print $2}'`
 	crlfile=`sudo grep -E "^crl-verify " "${OPENVPN_CONF}" | awk '{print $2}'`
-	if [[ -z ${OPENVPN_CERTS_LIST} ]]; then
+	if [[ -z ${OPENVPN_CERTS_ALLOW} ]]; then
 	    certs_files=`sudo find "${OPENVPN_CERTS}" -name "*.crt" -print 2>/dev/null|sort 2>/dev/null`
 	else
 	    while read line; do
 		file=`sudo find "${OPENVPN_CERTS}" -name "${line}*.crt" -print -quit 2>/dev/null`
 		[[ -z ${file} ]] && continue
 		files[${#files[@]}]="${file}"
-	    done < <(sort "${OPENVPN_CERTS_LIST}" 2>/dev/null)
+	    done < <(sort "${OPENVPN_CERTS_ALLOW}" 2>/dev/null)
 	    certs_files=`printf "%s\n" "${files[@]}"`
 	fi
 	if [[ -n ${certs_files} ]]; then
