@@ -14,8 +14,11 @@ APP_VER="0.0.1"
 APP_WEB="http://www.sergiotocalini.com.ar/"
 OPENVPN_LISTEN="0.0.0.0"
 OPENVPN_PORT="1194"
+OPENVPN_CONF="/etc/openvpn/server.conf"
 OPENVPN_STATUS="/etc/openvpn/openvpn-status.log"
 OPENVPN_CCD="/etc/openvpn/ccd"
+OPENVPN_PKI="/etc/openvpn/pki"
+OPENVPN_CERTS="/etc/openvpn/pki/certs"
 #
 #################################################################################
 
@@ -71,6 +74,10 @@ get_service() {
     return 0
 }
 
+# get_cert() {
+    
+# }
+
 get_status() {
     attr=${1}
     qfilter=${2}
@@ -102,6 +109,25 @@ discovery() {
     if [[ ${resource} == 'clients' ]]; then
 	for cli in `sudo ls -1 ${OPENVPN_CCD}`; do
 	    echo "${cli}"
+	done
+    elif [[ ${resource} == 'certs' ]]; then
+	cafile=`grep -E "^ca " "${OPENVPN_CONF}" | awk '{print $2}'`
+	crlfile=`grep -E "^crl-verify " "${OPENVPN_CONF}" | awk '{print $2}'`
+	for cert in "${OPENVPN_CERTS}/*.crt"; do
+	    while read line; do
+		key=`echo ${line}|awk -F'=' '{print $1}'|awk '{$1=$1};1'`
+		val=`echo ${line}|awk -F'=' '{print $2}'|awk '{$1=$1};1'`
+		if [[ -z ${val} ]]; then
+		    output+="${key}|"
+		else
+		    output+="${val}|"
+		fi
+	    done < <(openssl x509 -noout -in ${cert} -email -serial -dates 2>/dev/null)
+	    openssl verify -crl_check_all -verbose \
+	    	           -CAfile "${cafile}" \
+			   -CRLfile "${crlfile}" \
+			   "${cert}" > /dev/null
+	    output="${output%?}|${?}"
 	done
     else
 	echo ${res:-0}
