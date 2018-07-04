@@ -78,11 +78,11 @@ get_cert() {
     cert="${1}"
     attr="${2}"
 
-    file=`find "${OPENVPN_CERTS}" -name "${cert}*.crt" -print -quit`
+    file=` sudo find "${OPENVPN_CERTS}" -name "${cert}*.crt" -print -quit`
 
     if [[ -n ${file} ]]; then
-	OPENVPN_CA=`grep -E "^ca " "${OPENVPN_CONF}" | awk '{print $2}'`
-	OPENVPN_CRL=`grep -E "^crl-verify " "${OPENVPN_CONF}" | awk '{print $2}'`	
+	OPENVPN_CA=`sudo grep -E "^ca " "${OPENVPN_CONF}" | awk '{print $2}'`
+	OPENVPN_CRL=`sudo grep -E "^crl-verify " "${OPENVPN_CONF}" | awk '{print $2}'`	
 	if [[ ${attr} == 'status' ]]; then
 	    openssl verify -crl_check_all -verbose \
 	    	    -CAfile "${OPENVPN_CA}" \
@@ -141,13 +141,13 @@ discovery() {
 	    echo "${cli}"
 	done
     elif [[ ${resource} == 'certs' ]]; then
-	cafile=`grep -E "^ca " "${OPENVPN_CONF}" | awk '{print $2}'`
-	crlfile=`grep -E "^crl-verify " "${OPENVPN_CONF}" | awk '{print $2}'`
+	cafile=`sudo grep -E "^ca " "${OPENVPN_CONF}" | awk '{print $2}'`
+	crlfile=`sudo grep -E "^crl-verify " "${OPENVPN_CONF}" | awk '{print $2}'`
 	if [[ -z ${OPENVPN_CERTS_LIST} ]]; then
-	    certs_files=`find "${OPENVPN_CERTS}" -name "*.crt" -print|sort 2>/dev/null`
+	    certs_files=`sudo find "${OPENVPN_CERTS}" -name "*.crt" -print|sort 2>/dev/null`
 	else
 	    while read line; do
-		file=`find "${OPENVPN_CERTS}" -name "${line}*.crt" -print -quit`
+		file=`sudo find "${OPENVPN_CERTS}" -name "${line}*.crt" -print -quit`
 		[[ -z ${file} ]] && continue
 		files[${#files[@]}]="${file}"
 	    done < <(sort "${OPENVPN_CERTS_LIST}" 2>/dev/null)
