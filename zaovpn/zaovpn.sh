@@ -94,9 +94,11 @@ get_cert() {
 	elif [[ ${attr} == 'serial' ]]; then
 	    res=`openssl x509 -noout -in ${file} -serial 2>/dev/null|cut -d'=' -f2`
 	elif [[ ${attr} == 'before' ]]; then
-	    res=`openssl x509 -noout -in ${file} -startdate 2>/dev/null|cut -d'=' -f2`
+	    before=`openssl x509 -noout -in ${file} -startdate 2>/dev/null|cut -d'=' -f2`
+	    res=`date -d "${before}" +'%s'`
 	elif [[ ${attr} == 'after' ]]; then
-	    res=`openssl x509 -noout -in ${file} -enddate 2>/dev/null|cut -d'=' -f2`
+	    after=`openssl x509 -noout -in ${file} -enddate 2>/dev/null|cut -d'=' -f2`
+	    res=`date -d "${after}" +'%s'`
 	elif [[ ${attr} == 'expires' ]]; then
 	    after=`openssl x509 -noout -in ${file} -enddate 2>/dev/null|cut -d'=' -f2`
 	    res=$((($(date -d "${after}" +'%s') - $(date +'%s'))/86400))
