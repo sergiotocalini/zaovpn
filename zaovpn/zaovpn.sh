@@ -150,7 +150,7 @@ discovery() {
 		file=`sudo find "${OPENVPN_CERTS}" -name "${line}*.crt" -print -quit 2>/dev/null`
 		[[ -z ${file} ]] && continue
 		files[${#files[@]}]="${file}"
-	    done < <(sort "${OPENVPN_CERTS_ALLOW}" 2>/dev/null)
+	    done < <(sudo sort "${OPENVPN_CERTS_ALLOW}" 2>/dev/null)
 	    certs_files=`printf "%s\n" "${files[@]}"`
 	fi
 	if [[ -n ${certs_files} ]]; then
