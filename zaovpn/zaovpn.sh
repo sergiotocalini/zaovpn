@@ -153,15 +153,17 @@ discovery() {
 	    done < <(sort "${OPENVPN_CERTS_LIST}" 2>/dev/null)
 	    certs_files=`printf "%s\n" "${files[@]}"`
 	fi
-	while read cert; do
-	    output="`basename ${cert%.crt}`|"
-	    sudo openssl verify -crl_check_all -verbose \
-	    	 -CAfile "${cafile}" \
-		 -CRLfile "${crlfile}" \
-		 "${cert}" > /dev/null
-	    output="${output%?}|${?}"
-	    echo "${output}"
-	done < <(printf '%s\n' "${certs_files}")
+	if [[ -n ${certs_files} ]]; then
+	    while read cert; do
+		output="`basename ${cert%.crt}`|"
+		sudo openssl verify -crl_check_all -verbose \
+	    	     -CAfile "${cafile}" \
+		     -CRLfile "${crlfile}" \
+		     "${cert}" > /dev/null
+		output="${output%?}|${?}"
+		echo "${output}"
+	    done < <(printf '%s\n' "${certs_files}")
+	fi
     else
 	echo ${res:-0}
     fi
