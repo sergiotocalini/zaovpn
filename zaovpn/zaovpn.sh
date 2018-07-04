@@ -116,9 +116,17 @@ discovery() {
     elif [[ ${resource} == 'certs' ]]; then
 	cafile=`grep -E "^ca " "${OPENVPN_CONF}" | awk '{print $2}'`
 	crlfile=`grep -E "^crl-verify " "${OPENVPN_CONF}" | awk '{print $2}'`
-	while read cert_id; do
-	    cert_file=`find /etc/openvpn/pki/certs/ -name "${cert_id}.*.crt" -print -quit`
-	    [[ -z ${cert_file} ]] && continue
+	if [[ -z ${OPENVPN_CERTS_LIST} ]]; then
+	    certs_files=`find "${OPENVPN_CERTS}" -name "*.crt" -print`
+	else
+	    while read line; do
+		file=`find "${OPENVPN_CERTS}" -name "${line}*.crt" -print -quit`
+		[[ -z ${file} ]] && continue
+		certs_files[${#certs_files[@]}]="${file}"
+	    done < <(sort "${OPENVPN_CERTS_LIST}" 2>/dev/null)
+	fi
+	while read cert; do
+	    [[ -z ${cert} ]] && continue
 
 	    output="${cert_id}|"
 	    while read line; do
@@ -131,7 +139,7 @@ discovery() {
 			   "${cert_file}" > /dev/null
 	    output="${output%?}|${?}"
 	    echo "${output}"
-	done < <(sort "${OPENVPN_CERTS_LIST}")
+	done < <(printf '%s\n' "${certs_files}")
     else
 	echo ${res:-0}
     fi
