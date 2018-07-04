@@ -19,9 +19,7 @@ OPENVPN_STATUS="/etc/openvpn/openvpn-status.log"
 OPENVPN_CCD="/etc/openvpn/ccd"
 OPENVPN_PKI="/etc/openvpn/pki"
 OPENVPN_CERTS="/etc/openvpn/pki/certs"
-OPENVPN_CERTS_LIST="/etc/openvpn/pki/user-cert-list.txt"
-
-sort /etc/openvpn/pki/user-cert-list.txt
+OPENVPN_CERTS_ALLOW="/etc/openvpn/pki/user-cert-list.txt"
 #
 #################################################################################
 
@@ -117,28 +115,28 @@ discovery() {
 	cafile=`grep -E "^ca " "${OPENVPN_CONF}" | awk '{print $2}'`
 	crlfile=`grep -E "^crl-verify " "${OPENVPN_CONF}" | awk '{print $2}'`
 	if [[ -z ${OPENVPN_CERTS_LIST} ]]; then
-	    certs_files=`find "${OPENVPN_CERTS}" -name "*.crt" -print`
+	    certs_files=`find "${OPENVPN_CERTS}" -name "*.crt" -print|sort 2>/dev/null`
 	else
 	    while read line; do
 		file=`find "${OPENVPN_CERTS}" -name "${line}*.crt" -print -quit`
 		[[ -z ${file} ]] && continue
-		certs_files[${#certs_files[@]}]="${file}"
+		files[${#files[@]}]="${file}"
 	    done < <(sort "${OPENVPN_CERTS_LIST}" 2>/dev/null)
-	    certs_files=`printf "%s\n" "${certs_file[@]}"`
+	    certs_files=`printf "%s\n" "${files[@]}"`
 	fi
 	while read cert; do
-	    output="${cert_id}|"
+	    output="`basename ${cert%.crt}`|"
 	    while read line; do
 		val=`echo ${line}|awk -F'=' '{print $2}'|awk '{$1=$1};1'`
 		output+="${val}|"
-	    done < <(openssl x509 -noout -in ${cert_file} -serial -dates 2>/dev/null)
+	    done < <(openssl x509 -noout -in ${cert} -serial -dates 2>/dev/null)
 	    openssl verify -crl_check_all -verbose \
 	    	           -CAfile "${cafile}" \
 			   -CRLfile "${crlfile}" \
-			   "${cert_file}" > /dev/null
+			   "${cert}" > /dev/null
 	    output="${output%?}|${?}"
 	    echo "${output}"
-	done < "${certs_files}"
+	done < <(printf '%s\n' "${certs_files}")
     else
 	echo ${res:-0}
     fi
