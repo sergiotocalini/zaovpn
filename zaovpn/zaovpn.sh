@@ -74,9 +74,37 @@ get_service() {
     return 0
 }
 
-# get_cert() {
-    
-# }
+get_cert() {
+    cert="${1}"
+    attr="${2}"
+
+    file=`find "${OPENVPN_CERTS}" -name "${cert}*.crt" -print -quit`
+
+    if [[ -n ${file} ]]; then
+	OPENVPN_CA=`grep -E "^ca " "${OPENVPN_CONF}" | awk '{print $2}'`
+	OPENVPN_CRL=`grep -E "^crl-verify " "${OPENVPN_CONF}" | awk '{print $2}'`	
+	if [[ ${attr} == 'status' ]]; then
+	    openssl verify -crl_check_all -verbose \
+	    	    -CAfile "${OPENVPN_CA}" \
+		    -CRLfile "${OPENVPN_CRL}" \
+		    "${cert}" > /dev/null
+	    res="${?}"
+	elif [[ ${attr} == 'fingerprint' ]]; then
+	    res=`openssl x509 -noout -in ${cert} -fingerprint 2>/dev/null|cut -d'=' -f2`	    
+	elif [[ ${attr} == 'serial' ]]; then
+	    res=`openssl x509 -noout -in ${cert} -serial 2>/dev/null|cut -d'=' -f2`
+	elif [[ ${attr} == 'before' ]]; then
+	    res=`openssl x509 -noout -in ${cert} -startdate 2>/dev/null|cut -d'=' -f2`
+	elif [[ ${attr} == 'after' ]]; then
+	    res=`openssl x509 -noout -in ${cert} -enddate 2>/dev/null|cut -d'=' -f2`
+	elif [[ ${attr} == 'expires' ]]; then
+	    after=`openssl x509 -noout -in ${cert} -enddate 2>/dev/null|cut -d'=' -f2`
+	    res=$((($(date -d "${after}" +'%s') - $(date +'%s'))/86400))
+	fi
+    fi
+    echo "${res:-0}"
+    return 0    
+}
 
 get_status() {
     attr=${1}
@@ -130,9 +158,9 @@ discovery() {
 		output+="${val}|"
 	    done < <(openssl x509 -noout -in ${cert} -serial -dates 2>/dev/null)
 	    openssl verify -crl_check_all -verbose \
-	    	           -CAfile "${cafile}" \
-			   -CRLfile "${crlfile}" \
-			   "${cert}" > /dev/null
+	    	    -CAfile "${cafile}" \
+		    -CRLfile "${crlfile}" \
+		    "${cert}" > /dev/null
 	    output="${output%?}|${?}"
 	    echo "${output}"
 	done < <(printf '%s\n' "${certs_files}")
