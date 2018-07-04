@@ -147,7 +147,7 @@ discovery() {
 	    certs_files=`sudo find "${OPENVPN_CERTS}" -name "*.crt" -print|sort 2>/dev/null`
 	else
 	    while read line; do
-		file=`sudo find "${OPENVPN_CERTS}" -name "${line}*.crt" -print -quit`
+		file=`sudo find "${OPENVPN_CERTS}" -name "${line}*.crt" -print -quit 2>/dev/null`
 		[[ -z ${file} ]] && continue
 		files[${#files[@]}]="${file}"
 	    done < <(sort "${OPENVPN_CERTS_LIST}" 2>/dev/null)
@@ -204,19 +204,21 @@ if [[ ${JSON} -eq 1 ]]; then
     echo '   "data":['
     count=1
     while read line; do
-        IFS="|" values=(${line})
-        output='{ '
-        for val_index in ${!values[*]}; do
-            output+='"'{#${JSON_ATTR[${val_index}]:-${val_index}}}'":"'${values[${val_index}]}'"'
-            if (( ${val_index}+1 < ${#values[*]} )); then
-                output="${output}, "
+	if [[ ${line} != '' ]]; then
+            IFS="|" values=(${line})
+            output='{ '
+            for val_index in ${!values[*]}; do
+		output+='"'{#${JSON_ATTR[${val_index}]:-${val_index}}}'":"'${values[${val_index}]}'"'
+		if (( ${val_index}+1 < ${#values[*]} )); then
+                    output="${output}, "
+		fi
+            done 
+            output+=' }'
+            if (( ${count} < `echo ${rval}|wc -l` )); then
+		output="${output},"
             fi
-        done 
-        output+=' }'
-        if (( ${count} < `echo ${rval}|wc -l` )); then
-            output="${output},"
-        fi
-        echo "      ${output}"
+            echo "      ${output}"
+	fi
         let "count=count+1"
     done <<< ${rval}
     echo '   ]'
