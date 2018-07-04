@@ -155,10 +155,6 @@ discovery() {
 	fi
 	while read cert; do
 	    output="`basename ${cert%.crt}`|"
-	    while read line; do
-		val=`echo ${line}|awk -F'=' '{print $2}'|awk '{$1=$1};1'`
-		output+="${val}|"
-	    done < <(sudo openssl x509 -noout -in ${cert} -serial -dates 2>/dev/null)
 	    sudo openssl verify -crl_check_all -verbose \
 	    	 -CAfile "${cafile}" \
 		 -CRLfile "${crlfile}" \
