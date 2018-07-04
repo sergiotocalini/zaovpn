@@ -225,6 +225,9 @@ else
     if [[ ${SECTION} == 'status' ]]; then
 	rval=$( get_status ${ARGS[*]} )
 	rcode="${?}"
+    elif [[ ${SECTION} == 'cert' ]]; then
+	rval=$( get_cert ${ARGS[*]} )
+	rcode="${?}"
     elif [[ ${SECTION} == 'service' ]]; then
 	rval=$( get_service ${ARGS[*]} )
 	rcode="${?}"
