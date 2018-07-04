@@ -84,23 +84,23 @@ get_cert() {
 	OPENVPN_CA=`sudo grep -E "^ca " "${OPENVPN_CONF}" | awk '{print $2}'`
 	OPENVPN_CRL=`sudo grep -E "^crl-verify " "${OPENVPN_CONF}" | awk '{print $2}'`	
 	if [[ ${attr} == 'status' ]]; then
-	    openssl verify -crl_check_all -verbose \
-	    	    -CAfile "${OPENVPN_CA}" \
-		    -CRLfile "${OPENVPN_CRL}" \
-		    "${file}" > /dev/null
+	    sudo openssl verify -crl_check_all -verbose \
+	    	 -CAfile "${OPENVPN_CA}" \
+		 -CRLfile "${OPENVPN_CRL}" \
+		 "${file}" > /dev/null
 	    res="${?}"
 	elif [[ ${attr} == 'fingerprint' ]]; then
-	    res=`openssl x509 -noout -in ${file} -fingerprint 2>/dev/null|cut -d'=' -f2`	    
+	    res=`sudo openssl x509 -noout -in ${file} -fingerprint 2>/dev/null|cut -d'=' -f2`	    
 	elif [[ ${attr} == 'serial' ]]; then
-	    res=`openssl x509 -noout -in ${file} -serial 2>/dev/null|cut -d'=' -f2`
+	    res=`sudo openssl x509 -noout -in ${file} -serial 2>/dev/null|cut -d'=' -f2`
 	elif [[ ${attr} == 'before' ]]; then
-	    before=`openssl x509 -noout -in ${file} -startdate 2>/dev/null|cut -d'=' -f2`
+	    before=`sudo openssl x509 -noout -in ${file} -startdate 2>/dev/null|cut -d'=' -f2`
 	    res=`date -d "${before}" +'%s'`
 	elif [[ ${attr} == 'after' ]]; then
-	    after=`openssl x509 -noout -in ${file} -enddate 2>/dev/null|cut -d'=' -f2`
+	    after=`sudo openssl x509 -noout -in ${file} -enddate 2>/dev/null|cut -d'=' -f2`
 	    res=`date -d "${after}" +'%s'`
 	elif [[ ${attr} == 'expires' ]]; then
-	    after=`openssl x509 -noout -in ${file} -enddate 2>/dev/null|cut -d'=' -f2`
+	    after=`sudo openssl x509 -noout -in ${file} -enddate 2>/dev/null|cut -d'=' -f2`
 	    res=$((($(date -d "${after}" +'%s') - $(date +'%s'))/86400))
 	fi
     fi
@@ -158,11 +158,11 @@ discovery() {
 	    while read line; do
 		val=`echo ${line}|awk -F'=' '{print $2}'|awk '{$1=$1};1'`
 		output+="${val}|"
-	    done < <(openssl x509 -noout -in ${cert} -serial -dates 2>/dev/null)
-	    openssl verify -crl_check_all -verbose \
-	    	    -CAfile "${cafile}" \
-		    -CRLfile "${crlfile}" \
-		    "${cert}" > /dev/null
+	    done < <(sudo openssl x509 -noout -in ${cert} -serial -dates 2>/dev/null)
+	    sudo openssl verify -crl_check_all -verbose \
+	    	 -CAfile "${cafile}" \
+		 -CRLfile "${crlfile}" \
+		 "${cert}" > /dev/null
 	    output="${output%?}|${?}"
 	    echo "${output}"
 	done < <(printf '%s\n' "${certs_files}")
