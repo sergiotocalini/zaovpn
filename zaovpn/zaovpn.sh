@@ -19,7 +19,6 @@ OPENVPN_STATUS="/etc/openvpn/openvpn-status.log"
 OPENVPN_CCD="/etc/openvpn/ccd"
 OPENVPN_PKI="/etc/openvpn/pki"
 OPENVPN_CERTS="/etc/openvpn/pki/certs"
-OPENVPN_CERTS_ALLOW="/etc/openvpn/pki/user-cert-list.txt"
 #
 #################################################################################
 
