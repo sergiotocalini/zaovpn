@@ -126,8 +126,6 @@ discovery() {
 	    done < <(sort "${OPENVPN_CERTS_LIST}" 2>/dev/null)
 	fi
 	while read cert; do
-	    [[ -z ${cert} ]] && continue
-
 	    output="${cert_id}|"
 	    while read line; do
 		val=`echo ${line}|awk -F'=' '{print $2}'|awk '{$1=$1};1'`
@@ -139,7 +137,7 @@ discovery() {
 			   "${cert_file}" > /dev/null
 	    output="${output%?}|${?}"
 	    echo "${output}"
-	done < <(printf '%s\n' "${certs_files}")
+	done < <(printf '%s\n' "${certs_files[@]}")
     else
 	echo ${res:-0}
     fi
