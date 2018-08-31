@@ -87,7 +87,7 @@ get_cert() {
 	    sudo openssl verify -crl_check_all -verbose \
 	    	 -CAfile "${OPENVPN_CA}" \
 		 -CRLfile "${OPENVPN_CRL}" \
-		 "${file}" > /dev/null
+		 "${file}" > /dev/null 2>&1
 	    res="${?}"
 	elif [[ ${attr} == 'fingerprint' ]]; then
 	    res=`sudo openssl x509 -noout -in ${file} -fingerprint 2>/dev/null|cut -d'=' -f2`	    
