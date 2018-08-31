@@ -159,7 +159,7 @@ discovery() {
 		sudo openssl verify -crl_check_all -verbose \
 	    	     -CAfile "${cafile}" \
 		     -CRLfile "${crlfile}" \
-		     "${cert}" > /dev/null
+		     "${cert}" > /dev/null 2>&1
 		output="${output%?}|${?}"
 		echo "${output}"
 	    done < <(printf '%s\n' "${certs_files}")
