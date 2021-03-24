@@ -11,11 +11,10 @@ PATH=/usr/local/bin:${PATH}
 APP_NAME=$(basename $0)
 APP_DIR=$(dirname $0)
 APP_VER="0.0.1"
-APP_WEB="http://www.sergiotocalini.com.ar/"
-OPENVPN_LISTEN="0.0.0.0"
-OPENVPN_PORT="1194"
+APP_WEB="https://sergiotocalini.github.io/"
+OPENVPN_BIND="0.0.0.0:1194"
 OPENVPN_CONF="/etc/openvpn/server.conf"
-OPENVPN_STATUS="/etc/openvpn/openvpn-status.log"
+OPENVPN_STATS="/etc/openvpn/openvpn-status.log"
 OPENVPN_CCD="/etc/openvpn/ccd"
 OPENVPN_PKI="/etc/openvpn/pki"
 OPENVPN_CERTS="/etc/openvpn/pki/certs"
@@ -27,7 +26,7 @@ OPENVPN_CERTS="/etc/openvpn/pki/certs"
 #  Load Environment
 # ------------------
 #
-[[ -f ${APP_DIR}/${APP_NAME%.*}.conf ]] && . ${APP_DIR}/${APP_NAME%.*}.conf
+[ -r "${APP_DIR}/${APP_NAME%.*}.conf" ] && . "${APP_DIR}/${APP_NAME%.*}.conf"
 
 #
 #################################################################################
@@ -61,7 +60,7 @@ usage() {
     echo "  317"
     echo "  ~#"
     echo ""
-    echo "Please send any bug reports to sergiotocalini@gmail.com"
+    echo "Please send any bug reports to https://github.com/sergiotocalini/zaovpn/issues"
     exit 1
 }
 
@@ -83,7 +82,7 @@ ifArrayHas() {
 get_service() {
     resource=${1}
 
-    pid=`sudo lsof -Pi TCP@${OPENVPN_LISTEN}:${OPENVPN_PORT} -sTCP:LISTEN -t`
+    pid=`sudo lsof -Pi TCP@${OPENVPN_BIND} -sTCP:LISTEN -t`
     rcode="${?}"
     if [[ ${resource} == 'listen' ]]; then
 	if [[ ${rcode} == 0 ]]; then
@@ -143,7 +142,7 @@ get_status() {
 	index=4
     fi
     
-    raw=`sudo awk '/CLIENT LIST/,/ROUTING TABLE/' ${OPENVPN_STATUS} | tail -n +4 | head -n -1`
+    raw=`sudo awk '/CLIENT LIST/,/ROUTING TABLE/' ${OPENVPN_STATS} | tail -n +4 | head -n -1`
     if ! [[ -z ${qfilter} ]]; then
 	raw=`echo "${raw}" | grep "${qfilter}"`
     fi
